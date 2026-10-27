@@ -1,0 +1,54 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# Environment variables & secrets
+.env
+*.secret
+
+# IDEs & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Vector store database files (large / local indices)
+vector_store/chroma.sqlite3
+vector_store/*/
+
+# Cache and Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large raw datasets (allow sample files)
+data/raw/*.pcap
+data/raw/*_large.csv
