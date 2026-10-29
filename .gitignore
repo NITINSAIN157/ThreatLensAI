@@ -40,10 +40,6 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Vector store database files (large / local indices)
-vector_store/chroma.sqlite3
-vector_store/*/
-
 # Cache and Pytest
 .pytest_cache/
 .coverage

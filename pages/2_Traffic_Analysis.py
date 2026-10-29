@@ -15,7 +15,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.predict import ThreatLensPredictor
-from src.rag_assistant import ThreatLensSecurityAssistant
 
 st.set_page_config(page_title="ThreatLens AI - Traffic Analysis", page_icon="🔍", layout="wide")
 
@@ -36,10 +35,6 @@ st.markdown("""
 @st.cache_resource
 def load_predictor():
     return ThreatLensPredictor(models_dir="models")
-
-@st.cache_resource
-def load_assistant():
-    return ThreatLensSecurityAssistant()
 
 st.title("🔍 Network Traffic Analysis & Inference")
 st.markdown("Execute real-time **PyTorch Deep Learning** inference on network-flow records with explainable feature attribution.")
@@ -204,18 +199,20 @@ if df_input is not None:
                 unsafe_allow_html=True
             )
             
-            # Action: Query RAG Assistant for this alert
+            # Security Analyst Triage Context
             dst_port = 80
             for col in flow_row.index:
                 if "port" in col.lower():
                     dst_port = int(flow_row[col])
                     break
                     
-            if st.button("🛡️ Investigate Alert in RAG Security Assistant"):
-                st.session_state["rag_query"] = (
-                    f"The neural network model flagged a connection on destination port {dst_port} "
-                    f"with anomaly score {score_val:.2f} ({flow_row['Prediction']}). "
-                    f"Top contributing features: {flow_row['Top_Contributing_Features']}. "
-                    f"What adversary techniques, triage checks, and containment steps should be executed?"
+            if score_val >= predictor.threshold:
+                st.warning(
+                    f"⚠️ **High-Risk Connection Alert:** Destination Port `{dst_port}` flagged with anomaly score "
+                    f"`{score_val:.3f}`. The primary drivers are {flow_row['Top_Contributing_Features']}. "
+                    "Recommend immediate inspection of endpoint connection state and firewall rule verification."
                 )
-                st.info("Query context transferred! Switch to the **RAG Security Assistant** page in the sidebar to review the full guidance.")
+            else:
+                st.success(
+                    f"✅ **Normal Connection Profile:** Traffic to Destination Port `{dst_port}` matches expected baseline characteristics."
+                )

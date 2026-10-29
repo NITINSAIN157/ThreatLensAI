@@ -1,10 +1,9 @@
-# ThreatLens AI — Explainable Network Intrusion Detection with RAG
+# ThreatLens AI — Explainable Deep Learning Network Intrusion Detection
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/PyTorch-2.2+-ee4c2c.svg" alt="PyTorch">
   <img src="https://img.shields.io/badge/Dataset-CIC--IDS2017-orange.svg" alt="Dataset">
-  <img src="https://img.shields.io/badge/VectorDB-ChromaDB-purple.svg" alt="ChromaDB">
   <img src="https://img.shields.io/badge/Frontend-Streamlit-ff4b4b.svg" alt="Streamlit">
   <img src="https://img.shields.io/badge/Tests-Passing%20(100%25)-brightgreen.svg" alt="Tests">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License">
@@ -14,16 +13,14 @@
 
 ## 📌 Executive Summary
 
-**ThreatLens AI** is an academic-grade cybersecurity project bridging **Deep Learning Network Intrusion Detection (NIDS)**, **Explainable Artificial Intelligence (XAI)**, and **Retrieval-Augmented Generation (RAG)**.
+**ThreatLens AI** is an academic-grade Deep Learning project for **Network Intrusion Detection (NIDS)** combined with **Explainable Artificial Intelligence (XAI)**.
 
-Traditional network intrusion detection systems often present two critical bottlenecks:
-1. **Black-box opacity**: Deep learning models may predict an anomaly score without explaining *which* connection characteristics triggered the alert.
-2. **Actionability gap**: Flagging suspicious traffic leaves security analysts with the burden of manual triage and playbook lookup under time pressure.
+Traditional deep learning models in cybersecurity operate as black boxes: they output a probability score indicating that network traffic is malicious, but fail to explain *which* underlying network flow features triggered the detection. 
 
-ThreatLens AI solves this by integrating three cohesive capabilities into a unified Security Operations Center (SOC) dashboard:
-- 🛡️ **Detection**: A PyTorch Multi-Layer Perceptron (MLP) trained on the benchmark **CIC-IDS2017** dataset to classify network flows as benign or malicious, benchmarked against a Logistic Regression baseline.
-- 🔬 **Explanation**: Mathematical gradient saliency attribution ($\text{Input} \times \nabla_{\text{Input}} \mathcal{L}$) highlights the top flow features (packet rate, SYN flags, flow duration) that drove each decision.
-- 🤖 **Guidance**: A RAG assistant retrieves grounded incident-response guidance and adversary tactics from **MITRE ATT&CK**, **NIST SP 800-61 Rev. 2**, and dataset specifications with verified citations.
+ThreatLens AI addresses this challenge with two core innovations:
+1. 🛡️ **Deep Learning Detection Core**: A PyTorch Multi-Layer Perceptron (MLP) trained on the benchmark **CIC-IDS2017** dataset to classify network flows as benign or malicious, rigorously benchmarked against a Logistic Regression baseline.
+2. 🔬 **Explainable AI (XAI) Attribution**: Mathematical gradient saliency attribution ($\text{Attribution}_i = x_i \cdot \frac{\partial \mathcal{L}}{\partial x_i}$) that pinpoints the exact physical connection features (packet rate, SYN flags, connection duration) driving each prediction.
+3. 🖥️ **Interactive Security Operations Dashboard**: A multi-page Streamlit SOC tool allowing live CSV batch uploads, real-time PyTorch inference, interactive Plotly confusion matrices, ROC/PR curves, and flow-by-flow drilldowns.
 
 ---
 
@@ -49,25 +46,14 @@ flowchart TD
     end
 
     subgraph Explainability["3. Explainable AI Saliency"]
-        K --> M[Input * Gradient Saliency]
+        K --> M[Input * Gradient Saliency Engine]
         M --> N[Per-Flow Top-Contributing Features]
     end
 
-    subgraph RAGAssistant["4. RAG Security Guidance"]
-        O[MITRE ATT&CK + NIST SP 800-61 + Playbooks] --> P[Semantic Chunking]
-        P --> Q[Sentence Transformers: all-MiniLM-L6-v2]
-        Q --> R[(ChromaDB Vector Store)]
-        S[User / Alert Triage Query] --> R
-        R --> T[Top-k Cited Passages]
-        T --> U[Grounded Extractive / LLM Synthesis Engine]
-        U --> V[Grounded Incident-Response Guidance with Citations]
-    end
-
-    subgraph SOCDashboard["5. Streamlit SOC Multi-Page Interface"]
+    subgraph SOCDashboard["4. Streamlit SOC Multi-Page Interface"]
         K & F --> W1[Page 2: Traffic Analysis & Live CSV Inference]
-        L --> W2[Page 4: Model Evaluation & Academic Benchmark]
-        V --> W3[Page 3: RAG Security Assistant]
-        W1 & W2 & W3 --> W0[Page 1: Security Operations Overview]
+        L --> W2[Page 3: Model Evaluation & Academic Benchmark]
+        W1 & W2 --> W0[Page 1: Security Operations Overview]
     end
 ```
 
@@ -88,7 +74,7 @@ Instead of raw, unmanageable packet captures (PCAPs), the dataset extracts bidir
 | **Timing Intervals** | `Flow IAT Mean`, `Flow IAT Std`, `Active/Idle` | Automated bot scripting (uniform low variance) vs. human traffic (high variance) |
 
 ### Leakage Prevention & Preprocessing
-To ensure rigorous academic standards:
+To maintain academic rigor:
 - **No Target Leakage**: Identifiers (`Flow ID`, `Source IP`, `Destination IP`, `Timestamp`) are explicitly stripped.
 - **Isolated Normalization**: The `StandardScaler` is fitted **strictly on the training split** and persisted in `models/preprocessing.pkl`.
 - **Zero-Variance Filtering**: Constant features across the training set are dropped to prevent numerical instability.
@@ -119,7 +105,7 @@ $$\mathcal{L} = -\left[ w_{\text{pos}} \cdot y \log \sigma(z) + (1 - y) \log (1 
 
 Evaluated on 900 held-out test flow records strictly isolated from model training:
 
-| Evaluation Metric | PyTorch Deep MLP | Logistic Regression Baseline | Improvement / Note |
+| Evaluation Metric | PyTorch Deep MLP | Logistic Regression Baseline | Note |
 | :--- | :---: | :---: | :--- |
 | **Precision** | **1.0000** | 1.0000 | Zero false positives on held-out split |
 | **Recall** | **1.0000** | 1.0000 | 100% detection of attack categories |
@@ -133,25 +119,13 @@ Evaluated on 900 held-out test flow records strictly isolated from model trainin
 
 ---
 
-## 🔍 Explainable AI (XAI) Saliency Engine
+## 🔬 Explainable AI (XAI) Saliency Engine
 
 Rather than displaying an uninformative raw probability score, ThreatLens computes gradient-based input saliency:
 
 $$\text{Attribution}_i = x_i \cdot \frac{\partial \mathcal{L}}{\partial x_i}$$
 
-For every flagged flow, the top contributing features are extracted (e.g., `Flow Packets/s (Z=4.82)`, `SYN Flag Count`, `Total Bwd Packets = 0`). This allows analysts to immediately understand the root physical connection anomaly.
-
----
-
-## 🤖 Grounded RAG Security Assistant
-
-The RAG assistant operates independently from the classifier to provide evidence-backed incident response:
-1. **Document Ingestion**: Ingests **MITRE ATT&CK** techniques, **NIST SP 800-61 Rev. 2** guidelines, and **CIC-IDS2017** diagnostic definitions.
-2. **Vector Database**: Uses **ChromaDB** with dense embeddings generated by `sentence-transformers/all-MiniLM-L6-v2` running on CPU.
-3. **Grounded Synthesis**:
-   - Supports external LLM providers (`Groq`, `OpenAI`, `Gemini`) via API keys in `.env`.
-   - **Zero-Cost Offline Fallback**: If no API key is provided, ThreatLens executes a built-in extractive synthesis engine that delivers structured findings with exact document, section, and page citations.
-4. **Guardrails**: Explicitly refuses to hallucinate when evidence is insufficient and strictly reminds analysts that high model scores measure statistical deviation rather than confirmed legal compromise.
+For every flagged flow, the top contributing features are extracted (e.g., `Flow Packets/s`, `SYN Flag Count`, `Total Bwd Packets = 0`). This allows analysts to immediately understand the root physical connection anomaly.
 
 ---
 
@@ -160,10 +134,12 @@ The RAG assistant operates independently from the classifier to provide evidence
 ```
 ThreatLens-AI/
 ├── app.py                     # Main Streamlit SOC operations hub
+├── run_app.bat                # Windows 1-click launcher script
 ├── requirements.txt           # Project dependencies
 ├── .env.example               # Environment variables template
 ├── .gitignore                 # Version control exclusions
-├── README.md                  # Comprehensive technical documentation
+├── README.md                  # Comprehensive academic & technical guide
+├── LICENSE                    # MIT License
 ├── data/
 │   ├── raw/                   # Raw CIC-IDS2017 benchmark CSV files
 │   │   ├── cicids2017_sample.csv
@@ -181,19 +157,11 @@ ThreatLens-AI/
 │   ├── data_preprocessing.py  # Cleaning, leakage prevention, splitting
 │   ├── train_model.py         # PyTorch training loop & baseline fit
 │   ├── predict.py             # Inference engine & batch CSV prediction
-│   ├── evaluate.py            # Academic evaluation suite
-│   ├── document_ingestion.py  # Text and PDF chunker
-│   ├── embeddings.py          # Sentence Transformers embedding engine
-│   ├── retriever.py           # ChromaDB semantic vector search
-│   └── rag_assistant.py       # Grounded RAG synthesis engine
-├── knowledge_base/
-│   └── documents/             # MITRE ATT&CK, NIST SP 800-61, and SOPs
-├── vector_store/              # ChromaDB persistent vector storage
+│   └── evaluate.py            # Academic evaluation suite
 ├── pages/
 │   ├── 1_Overview.py          # SOC telemetry & threat distribution
 │   ├── 2_Traffic_Analysis.py  # CSV upload, live inference, and drilldown
-│   ├── 3_Security_Assistant.py# Grounded RAG query interface
-│   └── 4_Model_Evaluation.py  # Comparative benchmark & Viva defense
+│   └── 3_Model_Evaluation.py  # Comparative benchmark & Viva defense
 ├── scripts/
 │   ├── download_dataset.py    # Official CIC-IDS2017 acquisition script
 │   ├── generate_sample_data.py# Benchmark subset generator
@@ -201,19 +169,15 @@ ThreatLens-AI/
 └── tests/
     ├── __init__.py
     ├── test_preprocessing.py  # Preprocessing & leakage tests
-    ├── test_prediction.py     # Inference & shape tests
-    └── test_retrieval.py      # Vector search & citation tests
+    └── test_prediction.py     # Inference & shape tests
 ```
 
 ---
 
 ## 🚀 Quickstart Guide
 
-### 1. Clone & Set Up Environment
+### 1. Set Up Environment
 ```bash
-git clone https://github.com/<your-username>/ThreatLens-AI.git
-cd ThreatLens-AI
-
 # Create virtual environment
 python -m venv venv
 
@@ -227,36 +191,18 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment (Optional)
-```bash
-cp .env.example .env
-# Edit .env if you wish to use an external LLM API key (Groq, OpenAI, or Gemini)
-# Otherwise, ThreatLens automatically runs using its built-in local grounded engine!
-```
-
-### 3. Run Automated Tests
-Verify that all 10 unit and integration tests pass:
+### 2. Run Automated Tests
+Verify that all unit and integration tests pass:
 ```bash
 pytest tests/ -v
 ```
 
-### 4. Train or Re-Evaluate (Optional)
-The repository comes pre-trained with artifacts in `models/`. To retrain from scratch:
+### 3. Launch the Streamlit SOC Dashboard
 ```bash
-# 1. Preprocess raw data
-python src/data_preprocessing.py
-
-# 2. Train PyTorch MLP & Baseline
-python src/train_model.py
-
-# 3. Evaluate models on test split
-python src/evaluate.py
+python -m streamlit run app.py
 ```
+*(On Windows, you can also simply double-click `run_app.bat`)*
 
-### 5. Launch the Streamlit SOC Dashboard
-```bash
-streamlit run app.py
-```
 Open your browser at `http://localhost:8501`.
 
 ---

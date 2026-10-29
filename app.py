@@ -1,5 +1,5 @@
 """
-ThreatLens AI - Explainable Network Intrusion Detection with RAG
+ThreatLens AI - Explainable Deep Learning Network Intrusion Detection
 Main Security Operations Center (SOC) Application Entry Point
 """
 
@@ -11,7 +11,7 @@ from pathlib import Path
 
 # Set Page Configuration
 st.set_page_config(
-    page_title="ThreatLens AI - SOC Operations Hub",
+    page_title="ThreatLens AI - Deep Learning NIDS",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -89,12 +89,12 @@ st.markdown("""
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/shield.png", width=64)
     st.title("ThreatLens AI")
-    st.markdown("**Explainable NIDS & RAG Assistant**")
+    st.markdown("**Explainable Deep Learning NIDS**")
     st.markdown("---")
     
     # System status checks
     model_ready = os.path.exists("models/mlp_model.pt") and os.path.exists("models/preprocessing.pkl")
-    vector_ready = os.path.exists("vector_store") and os.path.exists("knowledge_base/documents")
+    baseline_ready = os.path.exists("models/baseline_logreg.pkl")
     sample_ready = os.path.exists("data/raw/cicids2017_sample.csv")
     
     st.subheader("System Telemetry")
@@ -103,10 +103,10 @@ with st.sidebar:
     else:
         st.markdown("🔴 **PyTorch Model:** Missing")
         
-    if vector_ready:
-        st.markdown("🟢 **RAG Vector Store:** Indexed")
+    if baseline_ready:
+        st.markdown("🟢 **Baseline Model:** Evaluated")
     else:
-        st.markdown("🟡 **RAG Vector Store:** Pending")
+        st.markdown("🟡 **Baseline Model:** Pending")
         
     if sample_ready:
         st.markdown("🟢 **CIC-IDS2017 Dataset:** Loaded")
@@ -114,22 +114,22 @@ with st.sidebar:
         st.markdown("🟡 **Dataset:** Not found")
         
     st.markdown("---")
-    st.caption("ThreatLens AI Research Prototype v1.0\nBenchmarked on CIC-IDS2017 flow data.")
+    st.caption("ThreatLens AI Deep Learning Project\nBenchmarked on CIC-IDS2017 flow data.")
 
 # Main Page Header
 col1, col2 = st.columns([3, 1])
 with col1:
     st.title("ThreatLens AI — SOC Operations Hub")
     st.markdown(
-        "A hybrid cybersecurity operations system combining a **PyTorch Deep Learning Intrusion Detection Model** "
-        "with an **Explainable Feature Attribution Engine** and a **Grounded RAG Security Assistant**."
+        "An advanced deep learning cybersecurity system combining a **PyTorch Multi-Layer Perceptron (MLP)** "
+        "with an **Explainable Feature Attribution Engine** and rigorous benchmark evaluation on **CIC-IDS2017**."
     )
 with col2:
     st.markdown("""
     <div style='text-align: right; padding-top: 15px;'>
         <span class='badge-info'>Deep Learning</span>&nbsp;
         <span class='badge-critical'>PyTorch MLP</span>&nbsp;
-        <span class='badge-benign'>RAG + Chroma</span>
+        <span class='badge-benign'>XAI Saliency</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -146,7 +146,7 @@ with col_a:
             A PyTorch Multi-Layer Perceptron (MLP) trained on the benchmark <b>CIC-IDS2017</b> dataset 
             identifies suspicious network connections using 59 standardized numeric flow features.
         </p>
-        <span class='badge-info'>Batch & Single Flow Inference</span>
+        <span class='badge-info'>PyTorch Neural Network</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -156,7 +156,7 @@ with col_b:
         <h3>2. Explainable AI Saliency</h3>
         <p style='color: #8b949e; font-size: 0.92rem;'>
             Mathematical gradient-based feature attribution highlights the top flow features 
-            (packet rate, SYN flags, duration) that influenced the model to flag a flow.
+            (packet rate, SYN flags, duration) that influenced the neural network to flag a flow.
         </p>
         <span class='badge-critical'>Input * Gradient Attribution</span>
     </div>
@@ -165,12 +165,12 @@ with col_b:
 with col_c:
     st.markdown("""
     <div class='soc-card'>
-        <h3>3. Grounded RAG Guidance</h3>
+        <h3>3. Rigorous Evaluation</h3>
         <p style='color: #8b949e; font-size: 0.92rem;'>
-            A Retrieval-Augmented Generation assistant grounds triage questions in <b>MITRE ATT&CK</b>, 
-            <b>NIST SP 800-61</b>, and incident playbooks with exact technical citations.
+            Benchmarked against a Logistic Regression baseline on held-out test data. 
+            Reports Precision, Recall, F1-Score, ROC-AUC, PR-AUC, and sub-millisecond CPU latency.
         </p>
-        <span class='badge-benign'>Vector Search with Citations</span>
+        <span class='badge-benign'>Held-out Test Metrics</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -179,8 +179,7 @@ st.markdown("""
 Use the sidebar navigation tabs to explore each functional component:
 - 📊 **[1_Overview](1_Overview)**: High-level SOC telemetry, flow statistics, recent alerts, and architectural workflow.
 - 🔍 **[2_Traffic_Analysis](2_Traffic_Analysis)**: Upload network flow CSVs, execute real-time PyTorch inference, inspect flow attributions, and export analysis reports.
-- 🤖 **[3_Security_Assistant](3_Security_Assistant)**: Query the RAG knowledge base for grounded adversary tactics, flow diagnostics, and containment guidance.
-- 📈 **[4_Model_Evaluation](4_Model_Evaluation)**: Review academic evaluation metrics, baseline comparison against Logistic Regression, ROC/PR curves, confusion matrices, and latency.
+- 📈 **[3_Model_Evaluation](3_Model_Evaluation)**: Review academic evaluation metrics, baseline comparison against Logistic Regression, ROC/PR curves, confusion matrices, and latency benchmarks.
 """)
 
 # Quick KPI Snapshot
