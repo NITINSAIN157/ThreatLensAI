@@ -109,14 +109,19 @@ class ThreatLensPredictor:
                 risk_levels.append("BENIGN")
                 
         # Generate explanations for flagged / suspicious records
+        # Skip gradient loop entirely when top_k_explanations=0 (large batch fast mode)
         explanations = []
-        for i in range(len(scaled_features)):
-            if probs[i] >= (self.threshold - 0.15):  # Explain any border or suspicious flow
-                exp = self.model.explain_flow(tensor_x[i], self.feature_names, top_k=top_k_explanations)
-                exp_str = ", ".join([f"{e['feature']} ({e['attribution_score']:.2f})" for e in exp])
-                explanations.append(exp_str)
-            else:
-                explanations.append("Traffic matches standard baseline profile")
+        if top_k_explanations > 0:
+            for i in range(len(scaled_features)):
+                if probs[i] >= (self.threshold - 0.15):
+                    exp = self.model.explain_flow(tensor_x[i], self.feature_names, top_k=top_k_explanations)
+                    exp_str = ", ".join([f"{e['feature']} ({e['attribution_score']:.2f})" for e in exp])
+                    explanations.append(exp_str)
+                else:
+                    explanations.append("Traffic matches standard baseline profile")
+        else:
+            # Fast mode: use vectorised numpy attribution (no per-row backward pass)
+            explanations = ["Upload a smaller batch (<= 2,000 rows) to view per-flow XAI attribution."] * len(scaled_features)
                 
         results_df = original_df.copy()
         results_df["Anomaly_Score"] = np.round(probs, 4)

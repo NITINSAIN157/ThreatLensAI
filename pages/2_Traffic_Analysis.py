@@ -63,8 +63,31 @@ with col_input2:
 df_input = None
 if uploaded_file is not None:
     try:
-        df_input = pd.read_csv(uploaded_file)
-        st.success(f"Uploaded CSV loaded successfully ({len(df_input)} flow records).")
+        df_raw = pd.read_csv(uploaded_file)
+        total_uploaded = len(df_raw)
+
+        if total_uploaded > 2000:
+            st.warning(
+                f"⚡ **Large file detected:** {total_uploaded:,} rows uploaded. "
+                "Running inference on the full file may take several minutes on CPU. "
+                "Select how many rows to analyse below:"
+            )
+            max_rows = st.select_slider(
+                "Rows to analyse (sample from full file)",
+                options=[500, 1000, 2000, 5000, 10000, total_uploaded],
+                value=1000,
+                format_func=lambda x: f"All {x:,} rows" if x == total_uploaded else f"{x:,} rows (~{x//225:.0f} sec)"
+            )
+            if max_rows < total_uploaded:
+                df_input = df_raw.sample(n=max_rows, random_state=42).reset_index(drop=True)
+                st.info(f"✂️ Randomly sampled **{max_rows:,}** rows from {total_uploaded:,} for fast inference.")
+            else:
+                df_input = df_raw
+                st.info(f"Running on all {total_uploaded:,} rows — this may take a few minutes.")
+        else:
+            df_input = df_raw
+            st.success(f"Uploaded CSV loaded successfully ({total_uploaded:,} flow records).")
+
     except Exception as e:
         st.error(f"Failed to read CSV: {e}")
 elif load_sample:
@@ -75,10 +98,14 @@ elif load_sample:
     else:
         st.warning("Sample test batch file not found. Please upload a CSV.")
 
-# If data is available, run inference
+# If data is available, run inference — disable per-row gradient explanation for large batches
 if df_input is not None:
-    with st.spinner("Executing PyTorch Deep Learning inference & computing feature saliency..."):
-        results_df = predictor.predict_dataframe(df_input)
+    batch_size = len(df_input)
+    # Skip gradient saliency for large batches (>2000 rows) to keep it fast
+    top_k_exp = 3 if batch_size <= 2000 else 0
+
+    with st.spinner(f"Executing PyTorch Deep Learning inference on {batch_size:,} flows{' (saliency skipped for large batch)' if top_k_exp == 0 else ' & computing feature saliency'}..."):
+        results_df = predictor.predict_dataframe(df_input, top_k_explanations=top_k_exp)
         
     st.markdown("---")
     
