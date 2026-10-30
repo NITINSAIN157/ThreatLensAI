@@ -156,7 +156,7 @@ if df_input is not None:
                 
     st.dataframe(
         filtered_df[summary_cols],
-        use_container_width=True,
+        width='stretch',
         column_config={
             "Anomaly_Score": st.column_config.ProgressColumn(
                 "Anomaly Score", min_value=0.0, max_value=1.0, format="%.3f"
@@ -217,7 +217,7 @@ if df_input is not None:
                 height=250,
                 margin=dict(t=30, b=10, l=20, r=20)
             )
-            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.plotly_chart(fig_gauge, width='stretch')
             
         with d_col2:
             st.markdown("#### Top Contributing Features (Gradient Saliency)")

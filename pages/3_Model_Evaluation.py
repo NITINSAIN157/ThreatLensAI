@@ -102,7 +102,7 @@ with c_left:
         height=320,
         coloraxis_showscale=False
     )
-    st.plotly_chart(fig_cm, use_container_width=True)
+    st.plotly_chart(fig_cm, width='stretch')
 
 with c_right:
     st.subheader("Receiver Operating Characteristic (ROC)")
@@ -142,7 +142,7 @@ with c_right:
         margin=dict(t=20, b=20, l=20, r=20),
         height=320
     )
-    st.plotly_chart(fig_roc, use_container_width=True)
+    st.plotly_chart(fig_roc, width='stretch')
 
 st.markdown("---")
 

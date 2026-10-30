@@ -80,7 +80,7 @@ with col_chart1:
         margin=dict(t=20, b=20, l=20, r=20),
         height=320
     )
-    st.plotly_chart(fig_donut, use_container_width=True)
+    st.plotly_chart(fig_donut, width='stretch')
 
 with col_chart2:
     st.subheader("Detected Threat Categories")
@@ -101,7 +101,7 @@ with col_chart2:
         height=320,
         coloraxis_showscale=False
     )
-    st.plotly_chart(fig_bar, use_container_width=True)
+    st.plotly_chart(fig_bar, width='stretch')
 
 # Recent Alerts Feed
 st.subheader("🚨 Recent High-Confidence Network Flow Alerts")
@@ -144,7 +144,7 @@ sample_alerts = [
 df_alerts = pd.DataFrame(sample_alerts)
 st.dataframe(
     df_alerts,
-    use_container_width=True,
+    width='stretch',
     column_config={
         "Anomaly Score": st.column_config.ProgressColumn(
             "Anomaly Score", min_value=0.0, max_value=1.0, format="%.3f"
