@@ -207,26 +207,6 @@ Open your browser at `http://localhost:8501`.
 
 ---
 
-## 🎓 Academic Viva & Presentation Guide
-
-When presenting ThreatLens AI to your lecturer or examiners, highlight the following key technical considerations:
-
-### Q1: Why use an MLP instead of a simple tree-based model?
-> **Answer:** The PyTorch MLP demonstrates deep learning fundamentals: continuous representation learning, gradient backpropagation, batch normalization, and dropout regularization. Furthermore, neural networks allow direct gradient calculation ($\nabla_x \mathcal{L}$) for mathematically grounded feature attribution (XAI), which enables the explanation of alerts.
-
-### Q2: Why is PR-AUC critical for network intrusion detection?
-> **Answer:** In real enterprise traffic, benign connections represent 98%+ of records. Standard accuracy and ROC-AUC can be deceptively optimistic because a massive True Negative count reduces the apparent False Positive Rate ($FPR = \frac{FP}{FP + TN}$). **Precision-Recall AUC (PR-AUC)** focuses specifically on the minority attack class without factoring in the massive true negative pool.
-
-### Q3: How was data leakage prevented?
-> **Answer:**
-> 1. Session and host identifiers (`Flow ID`, `Source IP`, `Destination IP`, `Timestamp`) were dropped to prevent identity memorization.
-> 2. The `StandardScaler` was fitted strictly on the training partition.
-> 3. Decision threshold tuning was conducted strictly on the validation set, leaving the test split unobserved.
-
-### Q4: What is the limitation of the CIC-IDS2017 dataset?
-> **Answer:** CIC-IDS2017 was recorded in an emulated testbed environment at the University of New Brunswick. While it is an established academic benchmark, real-world networks exhibit evolving encrypted traffic (TLS 1.3), non-stationary protocol distributions, and novel zero-day attacks that require adaptive continuous learning.
-
----
 
 ## 📄 License
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
